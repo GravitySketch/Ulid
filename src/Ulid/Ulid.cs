@@ -251,6 +251,27 @@ namespace System // wa-o, System Namespace!?
 
             this = MemoryMarshal.Read<Ulid>(buf);
         }
+        
+        public Ulid(ulong msb, ulong lsb)
+        {
+            timestamp0 = (byte)((msb >> 56) & 0xffUL);
+            timestamp1 = (byte)((msb >> 48) & 0xffUL);
+            timestamp2 = (byte)((msb >> 40) & 0xffUL);
+            timestamp3 = (byte)((msb >> 32) & 0xffUL);
+            timestamp4 = (byte)((msb >> 24) & 0xffUL);
+            timestamp5 = (byte)((msb >> 16) & 0xffUL);
+            randomness0 = (byte)((msb >> 8) & 0xffUL);
+            randomness1 = (byte)(msb & 0xffUL);
+
+            randomness2 = (byte)((lsb >> 56) & 0xffUL);
+            randomness3 = (byte)((lsb >> 48) & 0xffUL);
+            randomness4 = (byte)((lsb >> 40) & 0xffUL);
+            randomness5 = (byte)((lsb >> 32) & 0xffUL);
+            randomness6 = (byte)((lsb >> 24) & 0xffUL);
+            randomness7 = (byte)((lsb >> 16) & 0xffUL);
+            randomness8 = (byte)((lsb >> 8) & 0xffUL);
+            randomness9 = (byte)(lsb & 0xffUL);
+        }
 
         // Factory
 
@@ -624,6 +645,32 @@ namespace System // wa-o, System Namespace!?
                 return this.CompareTo(ulid);
             }
             throw new ArgumentException("Object must be of type ULID.", nameof(value));
+        }
+        
+        public (ulong, ulong) ToUInt64() 
+        {
+            ulong msb = 0;
+            ulong lsb = 0;
+
+            msb |= (timestamp0 & 0xffUL) << 56;
+            msb |= (timestamp1 & 0xffUL) << 48;
+            msb |= (timestamp2 & 0xffUL) << 40;
+            msb |= (timestamp3 & 0xffUL) << 32;
+            msb |= (timestamp4 & 0xffUL) << 24;
+            msb |= (timestamp5 & 0xffUL) << 16;
+            msb |= (randomness0 & 0xffUL) << 8;
+            msb |= (randomness1 & 0xffUL);
+
+            lsb |= (randomness2 & 0xffUL) << 56;
+            lsb |= (randomness3 & 0xffUL) << 48;
+            lsb |= (randomness4 & 0xffUL) << 40;
+            lsb |= (randomness5 & 0xffUL) << 32;
+            lsb |= (randomness6 & 0xffUL) << 24;
+            lsb |= (randomness7 & 0xffUL) << 16;
+            lsb |= (randomness8 & 0xffUL) << 8;
+            lsb |= (randomness9 & 0xffUL);
+
+            return (msb, lsb);
         }
 
         public static explicit operator Guid(Ulid _this)

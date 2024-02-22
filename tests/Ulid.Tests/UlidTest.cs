@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.VisualBasic;
 using Xunit;
 
 namespace UlidTests
@@ -201,6 +202,16 @@ namespace UlidTests
             value.TryFormat(result, out var bytesWritten, Array.Empty<char>(), null).Should().BeTrue();
             bytesWritten.Should().Be(26);
             result.Should().Equal(utf8Value);
+        }
+
+        [Fact]
+        public void TryUInt64RoundTrip()
+        {
+            Ulid value1 = Ulid.NewUlid();
+            (ulong msb, ulong lsb) = value1.ToUInt64();
+            Ulid value2 = new Ulid(msb, lsb);
+            value2.Should().Equals(value1);
+            value2.ToString().Should().Equals(value1.ToString());
         }
     }
 }
